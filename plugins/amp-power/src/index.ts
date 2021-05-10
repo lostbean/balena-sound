@@ -9,13 +9,13 @@ export default async function main () {
   console.log(await client.listen())
 
   // Listen for play/stop events
-  client.on('play', (data: any) => {
+  client.on('play', (_: any) => {
     console.log('Started playing!')
-    console.log(data)
+    //console.log(data)
   })
-  client.on('stop', (data: any) => {
+  client.on('stop', (_: any) => {
     console.log('Stopped playing!')
-    console.log(data)
+    //console.log(data)
   })
 
   // Set volume to 100%
