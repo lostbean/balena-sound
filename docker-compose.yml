@@ -66,3 +66,7 @@ services:
     network_mode: host
     ports:
       - 49494:49494
+  
+  amp-power:
+    build: ./plugins/amp-power
+    restart: on-failure
