@@ -2,8 +2,7 @@ import BalenaAudio from './BalenaAudio'
 import * as Gpio from 'pigpio'
 
 const PULSE_SERVER = process.env.PULSE_SERVER
-const POWER_AMP_PIN = 7;
-const powerPin = new Gpio.Gpio(POWER_AMP_PIN, {mode: Gpio.Gpio.OUTPUT});
+const POWER_AMP_PIN = 26;
 
 export default async function main () {
 
@@ -12,6 +11,10 @@ export default async function main () {
   let info = await client.listen();
   console.log(info);
 
+  // Initialize GPIO
+  Gpio.terminate();
+  Gpio.initialize();
+  const powerPin = new Gpio.Gpio(POWER_AMP_PIN, {mode: Gpio.Gpio.OUTPUT});
   powerPin.digitalWrite(0);
 
   // Listen for play/stop events
