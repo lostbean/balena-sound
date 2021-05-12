@@ -1,25 +1,33 @@
 import BalenaAudio from './BalenaAudio'
+import * as Gpio from 'pigpio'
 
 const PULSE_SERVER = process.env.PULSE_SERVER
+const POWER_AMP_PIN = 7;
+const powerPin = new Gpio.Gpio(POWER_AMP_PIN, {mode: Gpio.Gpio.OUTPUT});
 
 export default async function main () {
 
   // Connect to audio block server
   let client = new BalenaAudio(PULSE_SERVER)
-  console.log(await client.listen())
+  let info = await client.listen();
+  console.log(info);
+
+  powerPin.digitalWrite(0);
 
   // Listen for play/stop events
   client.on('play', (_: any) => {
     console.log('Started playing!')
+    powerPin.digitalWrite(1);
     //console.log(data)
   })
   client.on('stop', (_: any) => {
     console.log('Stopped playing!')
+    powerPin.digitalWrite(0);
     //console.log(data)
   })
 
   // Set volume to 100%
-  await client.setVolume(100)
+  //await client.setVolume(100)
 
   // // Play with a decreasing volume pattern
   // let vol = 100
@@ -29,6 +37,5 @@ export default async function main () {
   //   console.log(`Volume is ${await client.getVolume()}%`)
   // }, 500)
 }
-
 
 main()

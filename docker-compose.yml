@@ -69,4 +69,10 @@ services:
   
   amp-power:
     build: ./plugins/amp-power
-    restart: on-failure
+    restart: always
+    # enable GPIO access (more on: https://www.balena.io/docs/learn/develop/multicontainer/)
+    privileged: true
+    devices:
+      - "/dev/gpiochip0:/dev/gpiochip0"
+    cap_add:
+      - SYS_RAWIO

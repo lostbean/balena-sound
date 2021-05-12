@@ -11,10 +11,9 @@ RUN curl https://www.kozco.com/tech/LRMonoPhase4.wav --silent --output test.wav
 
 WORKDIR /usr/src
 COPY . .
-
+RUN install_packages pigpio
 RUN npm install
 RUN npm run-script build
 
-# Run: "node play.js" or "node echo.js"
-#CMD node play.js
+#CMD ["balena-idle"]
 CMD [ "node", "build/index.js" ]
