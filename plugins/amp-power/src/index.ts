@@ -17,16 +17,14 @@ export default async function main () {
   const powerPin = new Gpio.Gpio(POWER_AMP_PIN, {mode: Gpio.Gpio.OUTPUT});
   powerPin.digitalWrite(0);
 
-  // Listen for play/stop events
+  // Listen for play/stop events and enable amp power
   client.on('play', (_: any) => {
     console.log('Started playing!')
     powerPin.digitalWrite(1);
-    //console.log(data)
   })
   client.on('stop', (_: any) => {
     console.log('Stopped playing!')
     powerPin.digitalWrite(0);
-    //console.log(data)
   })
 
   // Set volume to 100%
