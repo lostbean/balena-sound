@@ -38,4 +38,24 @@ export default async function main () {
   // }, 500)
 }
 
-main()
+function shutdown() {
+  console.info('Shuting down ...');
+  Gpio.terminate();
+  console.info('GPIO terminated');
+  console.info('tchau belo!');
+  process.exit(0);
+}
+
+process.on('SIGHUP', shutdown);
+process.on('SIGINT', shutdown);
+process.on('SIGCONT', shutdown);
+process.on('SIGTERM', shutdown);
+
+process.on('uncaughtException', err => {
+  console.error(`Uncaught Exception: ${err.message}`)
+  Gpio.terminate();
+  console.info('GPIO terminated');
+  process.exit(1)
+})
+
+main();
