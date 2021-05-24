@@ -1,5 +1,5 @@
 import BalenaAudio from './BalenaAudio'
-import * as Gpio from 'pigpio'
+import * as Gpio from 'onoff'
 
 const PULSE_SERVER = process.env.PULSE_SERVER
 const POWER_AMP_PIN = 26;
@@ -12,19 +12,20 @@ export default async function main () {
   console.log(info);
 
   // Initialize GPIO
-  Gpio.terminate();
-  Gpio.initialize();
-  const powerPin = new Gpio.Gpio(POWER_AMP_PIN, {mode: Gpio.Gpio.OUTPUT});
-  powerPin.digitalWrite(0);
+  if (!Gpio.Gpio.accessible) {
+    throw new Error("gpio not accessible!");
+  }
+  const powerPin = new Gpio.Gpio(POWER_AMP_PIN, 'out');
+  powerPin.write(0);
 
   // Listen for play/stop events and enable amp power
   client.on('play', (_: any) => {
     console.log('Started playing!')
-    powerPin.digitalWrite(1);
+    powerPin.write(1);
   })
   client.on('stop', (_: any) => {
     console.log('Stopped playing!')
-    powerPin.digitalWrite(0);
+    powerPin.write(0);
   })
 
   // Set volume to 100%
@@ -41,7 +42,6 @@ export default async function main () {
 
 function shutdown() {
   console.info('Shuting down ...');
-  Gpio.terminate();
   console.info('GPIO terminated');
   console.info('tchau belo!');
   process.exit(0);
@@ -54,7 +54,6 @@ process.on('SIGTERM', shutdown);
 
 process.on('uncaughtException', err => {
   console.error(`Uncaught Exception: ${err.message}`)
-  Gpio.terminate();
   console.info('GPIO terminated');
   process.exit(1)
 })
