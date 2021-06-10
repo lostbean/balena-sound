@@ -1,6 +1,6 @@
 (set-bounds! [-15 -15 -15] [15 15 15])
 (set-quality! 6)
-(set-resolution! 9)
+(set-resolution! 10)
 
 (define front-x-wire-space 1.3)
 (define back-x-wire-space 4.6)
@@ -13,7 +13,7 @@
 (define amp-y 11.3)
 (define amp-z 5.1)
 
-(define pi4-x 5.6)
+(define pi4-x 6)
 (define pi4-y 8.9)
 (define pi4-z 3.0)
 
@@ -22,14 +22,14 @@
 (define dac-z 0.7)
 
 (define gap 0.1)
-(define gyroid-freq 60)
+(define gyroid-freq 52)
 (define wall-thick 0.6)
 (define r-box 0.1)
 
 (define box-z
-  (+ wall-thick amp-z wall-thick 12V-z wall-thick))
+  (+ (* 2 wall-thick) amp-z 12V-z wall-thick))
 (define box-x
-  (+ wall-thick wall-thick (max amp-x (+ 12V-x pi4-x gap))))
+  (+ (* 3 wall-thick) (max amp-x (+ 12V-x pi4-x gap))))
 (define box-y
   (+ wall-thick wall-thick (max amp-y 12V-y pi4-y)))
 
@@ -37,7 +37,7 @@
   (union
     (move
       (rotate-y
-        (cylinder-z (* amp-z 0.5) (- box-x amp-x))
+        (cylinder-z (* amp-z 0.4) (- box-x amp-x))
       (/ pi -2))
     [6 0])
     (box-centered [amp-x amp-y amp-z])))
@@ -76,7 +76,7 @@
 
 (define air-duct
   (intersection
-    (move (rotate-x (cylinder 3 box-y) (/ pi 2)) [0 (/ box-y 2) 1])
+    (move (rotate-x (cylinder 3.5 box-y) (/ pi 2)) [0 (/ box-y 2) 1])
     (gyroid [gyroid-freq gyroid-freq gyroid-freq] 3)))
 
 (define wire-duct
@@ -87,23 +87,25 @@
      (house-z 3)
      (loft-x  2)
      (x (/ (- box-x (* 2 wall-thick) (* 2 house-x) (* 2 loft-x)) 2))
+     (wire-z-shift (- (/ house-z 2) wire-d))
      (couple (loft
       (move
         (rectangle-centered-exact [house-y house-z]) [(- wire-d (/ house-y 2)) 0])
-      (circle wire-d)
+      (move
+        (circle wire-d) [0 wire-z-shift])
       0
       loft-x)))
   (symmetric-x (union
     (move (rotate-z (rotate-x couple (/ pi -2)) (/ pi 2)) [(+ x loft-x) 0])
     (move (box-centered [house-x house-y house-z]) [(+ x loft-x (/ house-x 2)) (- wire-d (/ house-y 2))])
     (move (rotate-x (cylinder-z wire-d x) (/ pi 2)) [(+ x loft-x house-x) 0])
-    (rotate-y (cylinder-z wire-d x) (/ pi -2))))))
+    (move (rotate-y (cylinder-z wire-d x) (/ pi -2)) [0 0 (- wire-z-shift)])))))
 
 (define wire-duct-amp
   (let
     ((x (/ (- box-z wall-thick wall-thick) 2))
      (wire-d 0.5)
-     (house-d 1.24)
+     (house-d 1.65)
      (house-len 4))
   (union
     (move (rotate-y (cylinder-z house-d house-len) (/ pi -2)) [(- wire-d) 0])
@@ -126,10 +128,11 @@
     front-cover
     back-cover
     (move amp-cavit [x-amp-pos 0 z-amp-pos])
-    (move air-duct [0 0 -0.5])
+    (move air-duct [-1 0 -1])
     (move pi4-cavit [x-pi4-pos 0 z-12v-pos])
     (move 12V-cavit [x-12v-pos 0 z-12v-pos])
     (symmetric-y (move wire-duct [0 wire-y lower-wire-z]))
     (symmetric-y (move wire-duct-amp [(- half-box-x wall-thick 3.5) 4 2])))))
 
 sound-case
+;wire-duct
