@@ -29,7 +29,7 @@
 (define box-z
   (+ (* 2 wall-thick) amp-z 12V-z wall-thick))
 (define box-x
-  (+ (* 3 wall-thick) (max amp-x (+ 12V-x pi4-x gap))))
+  (+ (* 2 wall-thick) (max amp-x (+ 12V-x pi4-x gap))))
 (define box-y
   (+ wall-thick wall-thick (max amp-y 12V-y pi4-y)))
 
@@ -113,6 +113,12 @@
     (move (cylinder-z wire-d x) [0 0 (- x)])
     (move (sphere house-d) [(- wire-d) 0]))))
 
+(define ima-r 0.255)
+(define ima-h 0.22)
+
+(define ima-hole
+  (rotate-y (cylinder ima-r ima-h) (/ pi 2)))
+
 (define sound-case
   (let (
     (x-12v-pos (+ (- half-box-x) (* 12V-x 0.5) wall-thick))
@@ -128,11 +134,22 @@
     front-cover
     back-cover
     (move amp-cavit [x-amp-pos 0 z-amp-pos])
-    (move air-duct [-1 0 -1])
+    (move air-duct [-0.7 0 -1])
     (move pi4-cavit [x-pi4-pos 0 z-12v-pos])
     (move 12V-cavit [x-12v-pos 0 z-12v-pos])
-    (symmetric-y (move wire-duct [0 wire-y lower-wire-z]))
-    (symmetric-y (move wire-duct-amp [(- half-box-x wall-thick 3.5) 4 2])))))
+    (symmetric-y
+      (move wire-duct [0 wire-y lower-wire-z]))
+    (symmetric-y 
+      (move wire-duct-amp [(- half-box-x wall-thick 3.5) 4 2]))
+    ;; imãs
+    (symmetric-x
+      (symmetric-z
+        (symmetric-y
+          (move ima-hole [
+            (- half-box-x wall-thick (- (/ ima-h 2)))
+            (- half-box-y wall-thick -0.2)
+            (- half-box-z wall-thick -0.2)])))))))
 
 sound-case
 ;wire-duct
+
